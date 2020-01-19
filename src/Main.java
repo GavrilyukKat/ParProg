@@ -1,42 +1,59 @@
+import javafx.concurrent.Task;
+import java.sql.Array;
+import java.util.Random;
+
 public class Main {
-    public static void main (String[] args)
-    {
-        Matrix matrix = new Matrix();
+    public static int threadCount = 5;//number of threads
 
-        double[][] directAnswerMatrix = new double[Constants.numberOfStepsT][Constants.numberOfStepsX];
-        double[][] approximateAnswersMatrix = new double[Constants.numberOfStepsT][Constants.numberOfStepsX];
-        long startTime = System.currentTimeMillis();
+    public static void main(String[] args) {
+        double[] vectN = new double[1000];
+        int vectLong = 1000;
+        int startIndex;
+        int endIndex;
 
-        matrix.calcDirectMatrix (directAnswerMatrix);
+        //create array for N for 1000 elements
+        for (int i = 0; i < vectLong ; i++) {
+            Random rand = new Random();
+            vectN[i]= rand.nextDouble();
+        }
 
-        //calculate approximate matrix
-        matrix.fillFirstRow (approximateAnswersMatrix);
-        matrix.fillEdgeCondition (approximateAnswersMatrix, Constants.stepT);
-        matrix.CalcApproxMatrix (approximateAnswersMatrix);
+        long timer = System.currentTimeMillis();
+        //non-parallel timer
+        ThreadPar threadNonPar = new ThreadPar(vectN, 0, vectLong - 1);
+        threadNonPar.start();
+        try {
+            threadNonPar.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Non parallel took: " + (System.currentTimeMillis() - timer));
 
-        long timeSpent = System.currentTimeMillis() - startTime;
-
-        System.out.println("Sequential calculations was " + timeSpent + " ms");
-
-        Representation.printToFile(directAnswerMatrix, "/Users/Katarina/Documents/Labs/directAnswersParCW.txt");
-        Representation.printToFile(approximateAnswersMatrix, "/Users/Katarina/Documents/Labs/aproximateAnswersParCW.txt");
-
-        double[][] directAnswersMatrixPar = new double[Constants.numberOfStepsT][Constants.numberOfStepsX];
-
-        ParallelCalculations.streamDirect(directAnswersMatrixPar);
-
-        Representation.printToFile(directAnswersMatrixPar, "/Users/Katarina/Documents/Labs/directAnswersParParCW.txt");
-
-        //print on screen
-        //String stringDir = "Direct calculation";
-        //String stringApr = "Approximate calculation";
-        //representation.printOnScreen (directAnswerMatrix,stringDir);
-        //representation.printOnScreen (approximateAnswersMatrix, stringApr);
-
-        //System.out.println("\n Sequential error: ");
-
-        SequentialCalculations.CalcError (directAnswerMatrix, approximateAnswersMatrix);
-
+        //parallel timer
+        timer = System.currentTimeMillis();
+        ThreadPar threadArray[] = new ThreadPar[threadCount];
+        int counter = 0;
+        for (int i = -1; i<(vectLong-1); i+=vectLong/threadCount) {
+            startIndex = i + 1;
+            endIndex = i + vectLong / threadCount;
+            ThreadPar threadPar = new ThreadPar(vectN, startIndex, endIndex);
+            threadArray[counter] = threadPar;
+            counter++;
+            threadPar.start();
+        }
+        for (int i = 0; i <threadCount ; i++) {
+            try {
+                threadArray[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        double parallelRes = 0;
+        for (int i = 0; i <threadCount ; i++) {
+            parallelRes += threadArray[i].getNormaL();
+        }
+        System.out.println("Parallel took: " + (System.currentTimeMillis() - timer));
+        System.out.println("Result is: " + parallelRes);
     }
 }
+
 
