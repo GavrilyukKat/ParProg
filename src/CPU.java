@@ -23,11 +23,7 @@ public class CPU implements Runnable {
                     task = queue2.get();
                 }
 
-            //} catch (InterruptedException e) {
-            //    e.printStackTrace();
-            //}
             System.out.println("CPU: Processed in time +" + task.calculateCPUprocessingTime() + "\n");
-            //try {
                 Thread.sleep(task.calculateCPUprocessingTime());
             }
             catch (InterruptedException e) {

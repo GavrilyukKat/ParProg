@@ -1,4 +1,3 @@
-
 public class Main {
 
     public static void main(String[] args) {
@@ -11,6 +10,5 @@ public class Main {
         CPU C = new CPU(q1,q2);
         new Thread(Cp).start();
         new Thread(C).start();
-       // System.out.println("\n Q1 percent is "+ Cp.getPersentQ1());
-}
+    }
 }

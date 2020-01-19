@@ -6,12 +6,8 @@ public class CPUQueue {
     private Queue<Task> queue = new LinkedList<>();
     private int capacity;
 
-    //private int coutnterQ1;
-    //public int processToGenerate;
-
-    public CPUQueue(int capacity) {//конструктор
+    public CPUQueue(int capacity) {
         this.capacity = capacity;
-        //this.processToGenerate = processToGenerate;
     }
 
     public synchronized Task get() throws InterruptedException {
