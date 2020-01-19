@@ -1,42 +1,16 @@
+
 public class Main {
-    public static void main (String[] args)
-    {
-        Matrix matrix = new Matrix();
 
-        double[][] directAnswerMatrix = new double[Constants.numberOfStepsT][Constants.numberOfStepsX];
-        double[][] approximateAnswersMatrix = new double[Constants.numberOfStepsT][Constants.numberOfStepsX];
-        long startTime = System.currentTimeMillis();
-
-        matrix.calcDirectMatrix (directAnswerMatrix);
-
-        //calculate approximate matrix
-        matrix.fillFirstRow (approximateAnswersMatrix);
-        matrix.fillEdgeCondition (approximateAnswersMatrix, Constants.stepT);
-        matrix.CalcApproxMatrix (approximateAnswersMatrix);
-
-        long timeSpent = System.currentTimeMillis() - startTime;
-
-        System.out.println("Sequential calculations was " + timeSpent + " ms");
-
-        Representation.printToFile(directAnswerMatrix, "/Users/Katarina/Documents/Labs/directAnswersParCW.txt");
-        Representation.printToFile(approximateAnswersMatrix, "/Users/Katarina/Documents/Labs/aproximateAnswersParCW.txt");
-
-        double[][] directAnswersMatrixPar = new double[Constants.numberOfStepsT][Constants.numberOfStepsX];
-
-        ParallelCalculations.streamDirect(directAnswersMatrixPar);
-
-        Representation.printToFile(directAnswersMatrixPar, "/Users/Katarina/Documents/Labs/directAnswersParParCW.txt");
-
-        //print on screen
-        //String stringDir = "Direct calculation";
-        //String stringApr = "Approximate calculation";
-        //representation.printOnScreen (directAnswerMatrix,stringDir);
-        //representation.printOnScreen (approximateAnswersMatrix, stringApr);
-
-        //System.out.println("\n Sequential error: ");
-
-        SequentialCalculations.CalcError (directAnswerMatrix, approximateAnswersMatrix);
-
-    }
+    public static void main(String[] args) {
+        int queueCapacity = 6;
+        int processToGenerate = 15;
+        System.out.println("\nQueue capacity = [" +queueCapacity + "], will be generated " + processToGenerate + "processes\n");
+        CPUQueue q1 = new CPUQueue(queueCapacity);
+        CPUQueue q2 = new CPUQueue(queueCapacity);
+        CPUProcess Cp = new CPUProcess(q1,q2,processToGenerate);
+        CPU C = new CPU(q1,q2);
+        new Thread(Cp).start();
+        new Thread(C).start();
+       // System.out.println("\n Q1 percent is "+ Cp.getPersentQ1());
 }
-
+}
